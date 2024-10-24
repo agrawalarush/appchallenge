@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+
+<head>
+    <style>
+        .bg-color {
+            background-color: #f8f9fa !important;
+            /* Light grey for the box */
+            padding: 20px;
+            border-radius: 8px;
+            color: #333;
+            /* Dark grey for the text */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bg-color:hover {
+            transform: translateY(-5px);
+            /* Slight lift on hover */
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+            /* Enhanced shadow on hover */
+        }
+
+        .cart-table th,
+        .cart-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .cart-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .cart-table th {
+            font-size: 1.2rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            /* Lighter border */
+        }
+
+        .cart-table td {
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .cart-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .row-image {
+            width: 100px;
+            height: auto;
+            border-radius: 5px;
+            /* Slight rounding for product images */
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+            /* Light shadow for product images */
+        }
+
+        .chg-quantity {
+            width: 20px;
+            cursor: pointer;
+        }
+
+        .btn-outline-dark,
+        .btn-success {
+            margin-right: 10px;
+            border-radius: 20px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .cart-summary h5 {
+            margin: 0;
+        }
+
+        .no-products {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Additional styling for a more modern feel */
+        a.btn-outline-dark,
+        a.btn-success {
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        a.btn-outline-dark:hover,
+        a.btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<div class="container" style="margin-top: 140px;">
+    <div class="col-lg-12">
+        <div class="box-element bg-color">
+            <a class="btn btn-outline-dark" href="/products/">
+                &#x2190; Continue Shopping
+            </a>
+
+            <br><br>
+
+            <div class="cart-summary">
+                <h5>Items: <strong>{{ number_of_items }}</strong></h5>
+                <h5>Total: <strong>${{ total_price }}</strong> <i>per week</i></h5>
+                <a class="btn btn-success" href="/user/checkout/">Checkout</a>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="box-element bg-color">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item, item_total_price in cart %}
+                    <tr>
+                        <td><img class="row-image" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        </td>
+                        <td>{{ item.product.name }}</td>
+                        <td>${{ item.product.price }}<br><i>{{ item.product.pay_every }}</i></td>
+                        <td class="quantity">
+                            <p>{{ item.quantity }}</p>
+                            <div class="quantity-control">
+                                <img src="{% static 'images/arrow-up.png' %}" alt="Increase"
+                                    data-product="{{ item.product.id }}" data-action="add"
+                                    class="chg-quantity update-cart">
+                                <img src="{% static 'images/arrow-down.png' %}" alt="Decrease"
+                                    data-product="{{ item.product.id }}" data-action="rm"
+                                    class="chg-quantity update-cart">
+                                <br>
+                                <br>
+                                <br>
+                                <br>
+                            </div>
+                        </td>
+                        <td>${{ item_total_price }}<br><i>{{ item.product.pay_every }}</i></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if no_items %}
+            <div class="no-products">
+                <h1>No products in the cart!</h1>
+                <a href="/products/" class="btn btn-outline-dark">Add Something!</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

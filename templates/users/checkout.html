@@ -1,0 +1,126 @@
+{% extends 'base.html'%}
+
+{% block content%}
+<style>
+    .padding {
+        padding-top: 5px;
+    }
+    .margin {
+        margin-right: 2px;
+    }
+    .hidden {
+        display: none!important;
+    }
+    .center-alinement {
+        text-align: center;
+    }
+    .correct {
+        color: green;
+    }
+    .yes-btn:hover {
+        background-color: #45a049; /* Darker green on hover */
+    }
+    .no-btn:hover {
+        background-color: red;
+    }
+    .redirect-btn {
+        align-self: center;
+    }
+    .btn-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Make sure the buttons span the entire width */
+    max-width: 300px; /* Limit the width if needed */
+    margin-bottom: 20px; /* Add some space between the row and the next element */
+}
+
+.yes-btn, .no-btn {
+    flex: 1;
+    margin: 0 5px; /* Space between the buttons */
+    text-align: center;
+}
+
+
+.redirect-btn {
+    margin: 20px 0;
+}
+</style>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="box-element btn-container">
+            <br>
+            <h3 class="center-alinement">Everything Right?</h3>
+            <p class="center-alinement">Please check that everything regarding the products is <u class="correct">correct</u>!</p>
+            <p id="confirmation-message" class="hidden center-alinement">We have sent 
+                {% for item, item_total_price in cart %} {{item.product.user}} (Owner of {{item.product.name}}), {% endfor %} an email. Please wait for them to approve your purchase!</p>
+            <br>
+            <div class="btn-row">
+                <a href="javascript:void(0)" id="place-order-btn" class="disapear yes-btn btn btn-success">Yes, place order!</a>
+                <a href="/user/cart" class="disapear no-btn btn btn-danger">No, back to cart!</a>
+            </div>
+            <a href="/products" id="redirecting-btn" class="btn btn-primary redirect-btn hidden">Find More Products!</a>
+            
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="box-element">
+            <h3 class="padding">Order summary</h3>
+            <hr>
+            {% for item, item_total_price in cart %}
+            <div class="cart-row">
+                <div style="flex:1.5"><img class="row-image" src="{{ item.product.image.url }}"></div>
+                <div style="flex:1"><strong class="margin">{{ item.quantity }}</strong> {{ item.product.name }}</div>
+                <div style="flex:1">${{ item.product.price }} <br> <i> each <br> {{ item.product.pay_every }}</i></div>
+                <div style="flex:1">${{ item_total_price }} <br> <i>{{ item.product.pay_every }}</i></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Inside your HTML template -->
+<script type="application/json" id="cart-data">
+</script>
+
+<script>
+    document.getElementById('place-order-btn').addEventListener('click', function() {
+    var confirmationMessage = document.getElementById('confirmation-message');
+    confirmationMessage.classList.remove('hidden');
+    var redirectBtn = document.getElementById('redirecting-btn');
+    redirectBtn.classList.remove('hidden');
+
+    var stdbtns = document.getElementsByClassName("disapear");
+    for (var i = 0; i < stdbtns.length; i++) {
+        stdbtns[i].classList.add("hidden");
+    }
+
+    // Send a POST request to trigger the cart clearing on the backend
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'  // Include the CSRF token for security
+        },
+    }).then(response => {
+        if (response.ok) {
+            console.log("Cart cleared!");
+        } else {
+            console.log("Failed to clear the cart.");
+        }
+    }).catch(error => {
+        console.error("Error:", error);
+    });
+});
+
+    </script>
+    
+
+
+{% endblock %}

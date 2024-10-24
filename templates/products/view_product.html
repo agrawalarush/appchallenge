@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .product-container {
+            margin: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-images {
+            text-align: center;
+        }
+        .product-images img {
+            width: 300px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .product-details {
+            margin-left: 30px;
+        }
+        .product-details h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        .product-price {
+            font-size: 28px;
+            color: #b12704;
+        }
+        .product-rating {
+            color: #ff9900;
+        }
+        .product-description {
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .add-to-cart-section {
+            padding: 20px;
+            border-radius: 4px;
+        }
+        .add-to-cart-section button {
+            background-color: #ffa41c;
+            color: black;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .add-to-cart-section button:hover {
+            background-color: #ff9900;
+        }
+        .delivery-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #565959;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container product-container">
+    <div class="row">
+        <!-- Product Images Section -->
+        <div class="col-md-4 product-images">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">  <!-- Use the actual image URL -->
+            <div class="mt-3">
+            </div>
+        </div>
+
+        <!-- Product Details Section -->
+        <div class="col-md-6 product-details">
+            <h1 style="color: black !important;">{{ product.name }}</h1>
+            <p class="product-price">$ {{ product.price }} {{ product.pay_every }}</p>
+            
+            <hr>
+
+            <!-- Short Description -->
+            <div class="product-description">
+                <p><strong>Description:</strong></p>
+                <p style="text-indent: 15px;">{{ product.description }}</p>
+            </div>
+            
+            <!-- Created by Section -->
+            <div class="created-by">
+                <p>Created by: <u>{{ product.user.username }}</u></p>
+            </div>
+        </div>
+
+        <div class="col-md-2 add-to-cart-section">
+            <div style="display: flex; align-items: center; flex-wrap: nowrap;">
+                <p class="product-price" style="margin: 0;">$ {{ product.price }}</p>
+                <span style="margin: 0 5px; color: #b12704;">{{ product.pay_every }}</span>
+            </div>
+            <br>
+            <a href="/user/cart" data-product="{{ product.id }}" data-action="add" class="btn update-cart" style="background-color: #ffa41c; size: 20px;">Add to Cart!</a>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}

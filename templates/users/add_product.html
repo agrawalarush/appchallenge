@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<style>
+  #product-form {
+    padding: 20px;
+    /* Add some padding for spacing */
+    border-radius: 8px;
+    /* Optional: rounded corners */
+  }
+
+  .form-control {
+    border-radius: 15px;
+    /* Makes the form fields more rounded */
+    padding: 10px;
+    /* Optional: add some padding inside the input fields */
+  }
+
+  .drag-drop-zone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    background: #D3D3D3;
+  }
+
+  .drag-drop-zone:hover {
+    background-color: #f8f9fa;
+  }
+
+  #gallery img {
+    width: 100px;
+    margin: 10px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 5px;
+  }
+
+  .card img {
+    width: 100%;
+    height: auto;
+  }
+
+  h2,
+  .card-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow effect */
+  }
+
+  #product-form {
+    margin-bottom: 20px;
+  }
+
+  #preview-image {
+    width: 100%;
+    max-height: 400px;
+    width: auto;
+    /* Adjust the max-width as per your requirement */
+  }
+
+  /* Ensure the price and pay_every dropdown are aligned properly */
+  .price-dropdown-row {
+    display: flex;
+    gap: 10px;
+    /* Adds some space between the price input and dropdown */
+    align-items: flex-end;
+    /* Aligns items at the bottom */
+  }
+
+  .price-input {
+    flex: 2;
+  }
+
+  .dropdown {
+    flex: 1;
+  }
+
+  /* Smaller font size for the Pay Every label */
+  .pay-every-label {
+    font-size: 1rem;
+    /* Smaller font size */
+  }
+
+  /* Add blue shadow when an input field is focused */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    box-shadow: 0 0 10px rgba(26, 124, 230, 1);
+    /* Blue shadow */
+    border-color: #0400ff;
+    /* Blue border color */
+    outline: none;
+    /* Remove default focus outline */
+  }
+</style>
+
+
+<div class="container mt-5">
+  <div class="row">
+    <!-- Left column: Form -->
+    <div class="col-md-6">
+      <h2 class="mb-4" style="color: white;">Add a Product</h2>
+
+      <form method="POST" enctype="multipart/form-data" id="product-form" action='/user/add_products/'>
+        {% csrf_token %}
+
+        <!-- Product Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label" style="color: white;">Product Name:</label>
+          {{ form.name }}
+          {% if form.name.errors %}
+          <ul class="text-danger">
+            {% for error in form.name.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <!-- Product Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label d-block" style="color: white;">Description:</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+          <ul class="text-danger">
+            {% for error in form.description.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <!-- Price and Pay Every dropdown (side by side) -->
+        <div class="mb-3 price-dropdown-row">
+          <!-- Product Price -->
+          <div class="price-input">
+            <label for="price" class="form-label" style="color: white;">Price:</label>
+            {{ form.price }}
+            {% if form.price.errors %}
+            <ul class="text-danger">
+              {% for error in form.price.errors %}
+              <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+
+          <!-- Pay Every (Dropdown) -->
+          <div class="dropdown">
+            <label for="pay_every" class="form-label pay-every-label" style="color: white;">Pay Every:</label>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="payEveryDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Select frequency
+              </button>
+              <ul class="dropdown-menu w-100" aria-labelledby="payEveryDropdown">
+                <li class="dropdown-item" onclick="selectPayEveryOption('per month')">Per Month</li>
+                <li class="dropdown-item" onclick="selectPayEveryOption('per week')">Per Week</li>
+              </ul>
+            </div>
+            <input type="hidden" name="pay_every" id="pay_every" value="{{ form.pay_every.value }}">
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="mb-3">
+          <label for="stock" class="form-label" style="color: white;">Quanitity:</label>
+          {{ form.stock }}
+          {% if form.stock.errors %}
+          <ul class="text-danger">
+            {% for error in form.stock.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <!-- Drag-and-Drop Single Image Upload -->
+        <div id="drop-area" class="drag-drop-zone">
+          <h3>Drag & Drop your image here</h3>
+          <p>Or click to select from files</p>
+          <input type="file" id="fileElem" name="image" accept="image/png, image/jpeg, image/jpg"
+            onchange="handleFiles(this.files)">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary mt-3">Add product!</button>
+      </form>
+    </div>
+
+    <!-- Right column: Product Preview -->
+    <div class="col-md-6">
+      <h2 class="mb-4" style="color: white;">Product Preview</h2>
+      <div class="card">
+        <img id="preview-image" class="card-img-top" src="{% static 'images/placeholder.png'%}" alt="Product image">
+        <div class="card-body">
+          <h5 class="card-title" id="preview-title">Product Name</h5>
+          <p class="card-text" id="preview-description">Description</p>
+          <p class="card-text"><strong>Price: </strong><span id="preview-price">$0.00</span> <span
+              id="preview-pay-every"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Handle live preview for product name
+  const nameInput = document.getElementById('id_name');
+  const descriptionInput = document.getElementById('id_description');
+  const priceInput = document.getElementById('id_price');
+  const payEveryDropdown = document.getElementById('payEveryDropdown');
+  const previewTitle = document.getElementById('preview-title');
+  const previewDescription = document.getElementById('preview-description');
+  const previewPrice = document.getElementById('preview-price');
+  const previewPayEvery = document.getElementById('preview-pay-every');
+  const previewImage = document.getElementById('preview-image');
+
+  // Live update for product name
+  nameInput.addEventListener('input', () => {
+    previewTitle.textContent = nameInput.value;
+  });
+
+  // Live update for product description
+  descriptionInput.addEventListener('input', () => {
+    previewDescription.textContent = descriptionInput.value;
+  });
+
+  // Live update for product price
+  priceInput.addEventListener('input', () => {
+    previewPrice.textContent = `$${priceInput.value}`;
+  });
+
+  // Function to select "Pay Every" option
+  function selectPayEveryOption(option) {
+    previewPayEvery.textContent = option;
+    document.getElementById('pay_every').value = option;
+    payEveryDropdown.textContent = option;
+  }
+
+  // Handle file input and update the image preview
+  function handleFiles(files) {
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = function () {
+      previewImage.src = reader.result;
+    }
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Set placeholders for the form fields
+  document.getElementById('id_name').placeholder = 'Name of product..';
+  document.getElementById('id_description').placeholder = 'A few words describing the product..';
+  document.getElementById('id_price').placeholder = 'How much?';
+  document.getElementById('id_stock').placeholder = 'How many in stock?';
+</script>
+
+{% endblock %}

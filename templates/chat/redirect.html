@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<head>
+    <style>
+        /* Style for centering and improving the layout */
+        .content_box {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 3px solid #f7ba5b;
+            padding: 40px;
+            background-color: #2c3e50;
+            /* Dark background */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Center the content */
+            width: 400px;
+            /* Limit the width for the form */
+            margin: 50px auto;
+            /* Center the box on the screen */
+            border-radius: 10px;
+            /* Rounded corners */
+        }
+
+        /* Style for the form elements */
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Style for input field */
+        input[type="number"],
+        select {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 2px solid #f7ba5b;
+            border-radius: 5px;
+            background-color: #34495e;
+            color: white;
+        }
+
+        /* Style for the submit button */
+        button {
+            background-color: #f7ba5b;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content_box">
+        <h2>Your Rooms:</h2>
+        {% if not allowed_rooms.count == 0%}
+        <br>
+        {% for i in allowed_rooms %}
+        <ul>
+            <a href="/chat/room/{{i.name}}" style="color: white;">
+            <li>
+                <p><u><i><strong>{{i.name}}</strong></i></u></p>
+            </li></a>
+        </ul>
+        {% endfor %}
+        {% else %}
+        <h1><i>No Rooms!</i></h1>
+        {% endif %}
+    </div>
+    <div class="content_box">
+        <h1>Enter Room ID</h1>
+        <form action="/chat/room/" method="POST">
+            {% csrf_token %}
+            <div>
+                {{ form.room_id }}
+            </div>
+            <button type="submit">Enter Room</button>
+        </form>
+    </div>
+
+    <script>
+        var form_fields = document.getElementsByTagName('input')
+        form_fields[2].placeholder = 'ID...';
+    </script>
+</body>
+{% endblock %}

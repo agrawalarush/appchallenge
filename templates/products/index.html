@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .max {
+    display: flex;
+    height: 380px;
+    /* To ensure images and content align well */
+    flex-direction: column;
+    /* Stack items vertically */
+    justify-content: space-between;
+    /* Space items evenly */
+  }
+
+  .card-img-top{
+    /* Full width */
+    height: 50%;
+    /* Fixed height */
+  }
+
+
+  .card-background {
+    background-color: #a3a9aa;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 5px;
+  }
+
+  .btn-color {
+    background-color: rgb(222, 148, 11);
+    color: black;
+  }
+
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #2c3e50 !important;
+  }
+
+  .white {
+    color: rgb(168, 161, 161);
+  }
+</style>
+<br>
+<h1 class="white">Products:</h1>
+<div class="row">
+  {% for product in products %}
+  <div class="col-md-4"> <!-- Use col-md-4 to make three cards per row on larger screens -->
+    <div class="card max" style="margin-top: 25px;">
+      <img src="{{ product.image.url }}" class="card-img-top">
+      <div class="card-body card-background">
+
+        <!-- Title and description in a flex container -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h5 class="card-title"><a style="color: black; display: inline; text-align: center;"
+              href="/products/{{ product.id }}">{{ product.name }}</a></h5>
+        </div>
+
+        <p class="card-text">${{ product.price }} {{ product.pay_every }}</p>
+
+        <!-- Created by -->
+        <p class="cart-text">Created by <i>{{ product.user }}</i></p>
+
+        <a href="/products/{{product.id}}" class="btn btn-color">Add to cart</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% if count == 0 %}
+  <br>
+  <br>
+  <h1 class="white">No products in your area!</h1>
+  {% endif %}
+</div>
+
+{% endblock %}

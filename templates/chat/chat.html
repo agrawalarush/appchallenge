@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<head>
+    <style>
+        /* Basic styling for the chat container */
+        .content_box {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 3px solid #f7ba5b;
+            padding: 20px;
+            background-color: #2c3e50;
+            /* Dark background */
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #34495e;
+            /* Darker background outside the chat box */
+        }
+
+        /* Style individual contents */
+        .content {
+            display: flex;
+            margin: 10px 0;
+            max-width: 70%;
+            /* Control max width of contents */
+            word-wrap: break-word;
+        }
+
+        .content p {
+            margin: 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-size: 16px;
+            line-height: 1.4;
+            color: black;
+        }
+
+        /* Style for current user's contents */
+        .self_background {
+            background-color: #3498db;
+            /* Blue for user's content */
+            color: white;
+            justify-self: flex-end;
+            border-top-right-radius: 20%;
+            /* Adjust corners */
+            border-top-left-radius: 20%;
+            border-bottom-left-radius: 20%;
+        }
+
+        /* Style for other users' contents */
+        .not_self_background {
+            background-color: #2ecc71;
+            /* Green for others' contents */
+            color: white;
+            justify-self: flex-start;
+            /* Align others' contents to the left */
+            border-top-right-radius: 20%;
+            /* Adjust corners */
+            border-top-left-radius: 15%;
+            border-bottom-right-radius: 15%;
+        }
+
+        .machine {
+            background-color: #474a49;
+            /* Grey for automatic contents */
+            color: white;
+            align-self: flex-start;
+            /* Align others' contents to the left */
+        }
+
+        /* Style for the form at the bottom */
+        .chat-form {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-form textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .chat-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .extra-info {
+            font-size: 12px;
+            color: grey;
+            margin-top: 5px;
+        }
+
+        /* Right-align extra info for self */
+        .extra-info.right {
+            text-align: right;
+        }
+
+        /* Left-align extra info for others */
+        .extra-info.left {
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+    <br>
+    <h1>Chat Room: {{ room_name }}</h1>
+    <div class="content_box">
+        <div class="contents">
+            {% for content in text %}
+            <div
+                class="content {% if content.sender == request.user %}self_background{% elif content.sender == machine %} machine{% else %}not_self_background{% endif %}">
+                <p>{{ content.content }}</p>
+            </div>
+            <div class="extra-info {% if content.sender == request.user %}right{% else %}left{% endif %}">
+                <strong>{{ content.sender.username }} </strong> {{ content.timestamp }}
+            </div>
+            {% endfor %}
+        </div>
+        <form method="POST" action="/chat/room/{{room.name}}/send/" class="chat-form">
+            {% csrf_token %}
+            <textarea id="input" name="content" required></textarea>
+            <button id="submit" type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        var form_fields = document.getElementsByTagName('input')
+        form_fields[1].placeholder = 'Type something..';
+
+        const input = document.getElementById("input")
+        input.addEventListener("keydown", (event) => {
+            if (event.keycode === 13) {
+                event.preventDefault()
+                document.getElementById("submit").click()
+            }
+        })
+    </script>
+</body>
+{% endblock %}
